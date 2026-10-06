@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Granary Siege 2.0</title>
+<style>
+:root{--bg1:#0b1020;--bg2:#1a1240;--glass:rgba(255,255,255,.06);--bd:rgba(255,255,255,.12);--ink:#eef1ff;--mut:#9aa3c7;--acc:#5eead4;--acc2:#a78bfa;--gold:#fbbf24;--bad:#fb7185;--ok:#4ade80}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.55 system-ui,"Segoe UI",Roboto,sans-serif;background:radial-gradient(1000px 600px at 80% -10%,#3b2a8c55,transparent),linear-gradient(160deg,var(--bg1),var(--bg2))}
+.wrap{max-width:1040px;margin:auto;padding:18px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.logo{font-size:22px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tabs{display:flex;gap:6px;background:var(--glass);border:1px solid var(--bd);padding:4px;border-radius:999px}
+.tabs button{border:0;background:none;color:var(--mut);padding:7px 16px;border-radius:999px;cursor:pointer;font:inherit}
+.tabs button.on{background:linear-gradient(90deg,var(--acc),var(--acc2));color:#0b1020;font-weight:700}
+.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:620px){.hud{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--glass);border:1px solid var(--bd);border-radius:14px;padding:10px 14px;backdrop-filter:blur(8px)}
+.stat small{color:var(--mut);display:block;font-size:11px;text-transform:uppercase;letter-spacing:.8px}
+.stat b{font-size:22px}
+.bar{height:6px;border-radius:9px;background:#ffffff1a;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .5s}
+.grid{display:grid;grid-template-columns:3fr 2fr;gap:14px}
+@media(max-width:780px){.grid{grid-template-columns:1fr}}
+.card{background:var(--glass);border:1px solid var(--bd);border-radius:18px;padding:18px;backdrop-filter:blur(10px)}
+.tag{display:inline-block;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--acc);border:1px solid var(--acc);border-radius:999px;padding:2px 10px;margin-bottom:8px}
+h2{margin:0 0 6px;font-size:20px}h3{margin:0 0 8px;font-size:15px;color:var(--acc2)}
+.q{color:#dfe4ff;font-size:16px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{border:1px solid var(--bd);background:#ffffff0d;color:var(--ink);border-radius:999px;padding:5px 14px;cursor:pointer;font:inherit}
+.chip.on{border-color:var(--gold);color:var(--gold);background:#fbbf2418}
+input{background:#0b102088;border:1px solid var(--bd);border-radius:10px;color:var(--ink);padding:9px 12px;width:110px;font:inherit}
+input:focus{outline:2px solid var(--acc2)}
+.btn{border:0;border-radius:12px;padding:10px 18px;font:inherit;font-weight:700;cursor:pointer;color:#0b1020;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:transform .1s}
+.btn:hover{transform:translateY(-1px)}.btn.ghost{background:#ffffff14;color:var(--ink);font-weight:500}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.shields{font-size:20px;letter-spacing:3px}
+.fb{margin-top:10px;font-weight:600;min-height:24px}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.steps{list-style:none;margin:0;padding:0;font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.steps li{padding:7px 10px;margin-bottom:6px;border-left:3px solid var(--acc2);background:#ffffff0a;border-radius:0 8px 8px 0;animation:in .4s both}
+@keyframes in{from{opacity:0;transform:translateX(-8px)}}
+.bins{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.bin{width:54px;min-height:70px;border:2px solid var(--bd);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:4px;cursor:pointer;background:#ffffff08;user-select:none;transition:border-color .2s}
+.bin:hover{border-color:var(--acc)}.bin.max{border-color:var(--bad);background:#fb718522}
+.bin span{font-size:11px;color:var(--mut)}.bin div{font-size:11px;word-break:break-all;text-align:center}
+.mut{color:var(--mut);font-size:13px}
+.hide{display:none}
+label{display:inline-flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mut);margin:0 10px 8px 0}
+svg text{fill:#0b1020;font:700 13px system-ui}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="logo">⚔ Granary Siege 2.0</div>
+    <div class="tabs"><button id="tabPlay" class="on">Campaign</button><button id="tabLab">Sandbox Lab</button></div>
+  </div>
+  <div class="hud">
+    <div class="stat"><small>Level</small><b id="sLvl">1</b><div class="bar"><i id="pg"></i></div></div>
+    <div class="stat"><small>Grain 🌾</small><b id="sGr">60</b></div>
+    <div class="stat"><small>Walls</small><b class="shields" id="sHp">🛡🛡🛡</b></div>
+    <div class="stat"><small>Streak / Best</small><b><span id="sSt">0</span> / <span id="sBest">0</span></b></div>
+  </div>
+
+  <div class="grid" id="play">
+    <section class="card">
+      <span class="tag" id="qTag">Briefing</span>
+      <h2 id="qTitle">Defend the village</h2>
+      <p class="q" id="qText">Raiders are coming. Each round is a counting problem: wager grain, answer correctly, and keep your walls standing. Wrong answers cost a wall.</p>
+      <div id="viz"></div>
+      <div id="ctl" class="hide">
+        <div class="mut">Wager (right answer returns double):</div>
+        <div class="chips" id="chips"></div>
+        <div class="row">
+          <input id="ans" type="number" min="0" placeholder="Answer">
+          <button class="btn" id="btnGo">Submit</button>
+          <button class="btn ghost" id="btnHint">Hint −5</button>
+        </div>
+      </div>
+      <div class="row"><button class="btn" id="btnNext">Start campaign</button></div>
+      <div class="fb" id="fb"></div>
+    </section>
+    <section class="card"><h3>Reasoning log</h3><ul class="steps" id="log"><li>Derivations appear here after each answer.</li></ul></section>
+  </div>
+
+  <div class="grid hide" id="lab">
+    <section class="card">
+      <h3>Pigeonhole</h3>
+      <label>Items N<input id="pN" type="number" value="23"></label><label>Boxes K<input id="pK" type="number" value="5"></label><label>Target r<input id="pR" type="number" value="6"></label>
+      <div class="row"><button class="btn ghost" id="bP1">Fullest box ≥ ?</button><button class="btn ghost" id="bP2">Items to force r</button></div>
+      <h3 style="margin-top:16px">Inclusion–Exclusion</h3>
+      <label>|A|<input id="iA" type="number" value="30"></label><label>|B|<input id="iB" type="number" value="25"></label><label>|C|<input id="iC" type="number" value="20"></label><br>
+      <label>|A∩B|<input id="iAB" type="number" value="10"></label><label>|A∩C|<input id="iAC" type="number" value="8"></label><label>|B∩C|<input id="iBC" type="number" value="6"></label><br>
+      <label>|A∩B∩C|<input id="iT" type="number" value="3"></label><label>Universe<input id="iU" type="number" value="60"></label>
+      <div class="row"><button class="btn ghost" id="bIE">Solve</button></div>
+      <h3 style="margin-top:16px">Selections</h3>
+      <label>n<input id="cN" type="number" value="10"></label><label>r<input id="cR" type="number" value="4"></label>
+      <div class="row"><button class="btn ghost" id="bC1">C(n,r)</button><button class="btn ghost" id="bC2">P(n,r)</button><button class="btn ghost" id="bC3">Rivals excluded</button></div>
+    </section>
+    <section class="card"><h3>Output</h3><ul class="steps" id="labLog"><li>Choose a solver.</li></ul><div id="labViz"></div></section>
+  </div>
+</div>
+
+<script>
+// ===== math core (BigInt keeps big inputs exact) =====
+const B=x=>BigInt(x);
+function nCr(n,r){n=B(n);r=B(r);if(r<0n||r>n)return 0n;const k=r<n-r?r:n-r;let res=1n;for(let i=1n;i<=k;i++)res=res*(n-k+i)/i;return res;}
+function nPr(n,r){n=B(n);r=B(r);if(r<0n||r>n)return 0n;let res=1n;for(let i=0n;i<r;i++)res*=(n-i);return res;}
+const ceilDiv=(a,b)=>Math.floor((a+b-1)/b), rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+
+function solvePigeonFull(N,K){const m=ceilDiv(N,K);
+  return {ans:B(m),steps:['Pigeonhole: N items in K boxes ⇒ some box has ≥ ⌈N/K⌉.',`N=${N}, K=${K}`,`⌈${N}/${K}⌉ = ${m}`,`Check: ${m-1} per box holds only ${K*(m-1)} < ${N}.`,`Answer: ${m}`]};}
+function solvePigeonForce(K,r){const n=K*(r-1)+1;
+  return {ans:B(n),steps:[`Worst case: every box holds r−1 = ${r-1}.`,`That absorbs ${K}×${r-1} = ${K*(r-1)} items.`,`One more item forces a box to reach ${r}.`,`Answer: ${K}(${r}−1)+1 = ${n}`]};}
+function solveIE(A,Bv,C,ab,ac,bc,t,U){const un=A+Bv+C-ab-ac-bc+t,none=U-un;
+  return {ans:B(none),steps:['|A∪B∪C| = ΣSingles − ΣPairs + Triple',`= ${A}+${Bv}+${C} − ${ab} − ${ac} − ${bc} + ${t}`,`= ${A+Bv+C} − ${ab+ac+bc} + ${t} = ${un}`,`Outside all sets = ${U} − ${un} = ${none}`],
+    regions:{a:A-ab-ac+t,b:Bv-ab-bc+t,c:C-ac-bc+t,ab:ab-t,ac:ac-t,bc:bc-t,t:t,o:none}};}
+function solveSel(n,r,k){
+  if(k==='C')return {ans:nCr(n,r),steps:['Order irrelevant: C(n,r) = n!/(r!(n−r)!)',`C(${n},${r}) = ${nCr(n,r)}`]};
+  if(k==='P')return {ans:nPr(n,r),steps:['Order matters: P(n,r) = n!/(n−r)!',`P(${n},${r}) = ${nPr(n,r)}`]};
+  const all=nCr(n,r),both=nCr(n-2,r-2);
+  return {ans:all-both,steps:['Total minus the forbidden groups.',`Total C(${n},${r}) = ${all}`,`Both rivals in: C(${n-2},${r-2}) = ${both}`,`Answer: ${all} − ${both} = ${all-both}`]};}
+
+// ===== visuals =====
+let trial=null; // interactive crate placement for pigeonhole rounds
+function drawBins(){
+  const left=trial.N-trial.c.reduce((a,b)=>a+b,0),mx=Math.max(...trial.c);
+  $('viz').innerHTML=`<div class="mut">Experiment: click a storehouse to add a crate, shift-click to remove. Crates left: <b>${left}</b>. Can you keep every storehouse small?</div>
+  <div class="bins">${trial.c.map((c,i)=>`<div class="bin ${c===mx&&mx>0?'max':''}" data-i="${i}"><div>${'🌾'.repeat(Math.min(c,5))}${c>5?'+':''}</div><span>${c}</span></div>`).join('')}</div>
+  <button class="btn ghost" id="rst">Reset</button> <span class="mut">Fullest so far: ${mx}</span>`;
+  document.querySelectorAll('.bin').forEach(b=>b.onclick=e=>{const i=+b.dataset.i,l=trial.N-trial.c.reduce((x,y)=>x+y,0);
+    if(e.shiftKey){if(trial.c[i]>0)trial.c[i]--;}else if(l>0)trial.c[i]++;drawBins();});
+  $('rst').onclick=()=>{trial.c.fill(0);drawBins();};
+}
+function staticBins(N,K){const c=Array(K).fill(0);for(let i=0;i<N;i++)c[i%K]++;
+  return `<div class="bins">${c.map(x=>`<div class="bin"><div>${'🌾'.repeat(Math.min(x,5))}${x>5?'+':''}</div><span>${x}</span></div>`).join('')}</div><div class="mut">An even spread of ${N} items.</div>`;}
+function venn(r){return `<svg viewBox="0 0 300 220" width="100%" style="max-width:340px"><rect x="2" y="2" width="296" height="216" rx="14" fill="none" stroke="#ffffff30"/>
+  <circle cx="115" cy="95" r="62" fill="#5eead4" fill-opacity=".75"/><circle cx="185" cy="95" r="62" fill="#a78bfa" fill-opacity=".75"/><circle cx="150" cy="150" r="62" fill="#fbbf24" fill-opacity=".75"/>
+  <text x="85" y="80">${r.a}</text><text x="200" y="80">${r.b}</text><text x="140" y="190">${r.c}</text>
+  <text x="140" y="75">${r.ab}</text><text x="108" y="135">${r.ac}</text><text x="172" y="135">${r.bc}</text><text x="141" y="112">${r.t}</text>
+  <text x="14" y="208" style="fill:#9aa3c7">outside: ${r.o}</text></svg>`;}
+
+// ===== game state =====
+const $=id=>document.getElementById(id);
+const G={lvl:1,grain:60,hp:3,streak:0,solved:0,cur:null,hinted:false,live:false,wager:0,best:+(localStorage.getItem('gs2_best')||0)};
+function hud(){$('sLvl').textContent=G.lvl;$('sGr').textContent=G.grain;$('sHp').textContent=G.hp>0?'🛡'.repeat(G.hp):'💀';$('sSt').textContent=G.streak;$('sBest').textContent=G.best;$('pg').style.width=(G.solved%3)/3*100+'%';}
+function steps(list,el){el.innerHTML=list.map((s,i)=>`<li style="animation-delay:${i*.25}s">${s}</li>`).join('');}
+function makeRound(){const L=G.lvl,k=rnd(0,3);
+  if(k===0){const K=rnd(3,4+L),N=K*rnd(2,3+L)+rnd(1,K-1);return {tag:'Pigeonhole',title:'Raid on the storehouses',text:`${N} crates are hidden across ${K} storehouses. However they are arranged, at least how many crates sit in the fullest one?`,s:solvePigeonFull(N,K),hint:'Try the ceiling of N divided by K.',trial:{N,c:Array(K).fill(0)}};}
+  if(k===1){const K=rnd(3,5+L),r=rnd(3,4+L);return {tag:'Pigeonhole',title:'The scouts arrive',text:`${K} watchtowers report scouts. How many scouts must arrive to GUARANTEE some tower sees at least ${r}?`,s:solvePigeonForce(K,r),hint:'Imagine the worst case: every tower stuck at r−1.'};}
+  if(k===2){const t=rnd(1,4),ab=t+rnd(2,6),ac=t+rnd(2,6),bc=t+rnd(2,6),A=ab+ac-t+rnd(3,10),Bv=ab+bc-t+rnd(3,10),C=ac+bc-t+rnd(3,10),un=A+Bv+C-ab-ac-bc+t,U=un+rnd(2,15);
+    return {tag:'Inclusion–Exclusion',title:'Census of the guilds',text:`Village of ${U}. Smiths ${A}, Farmers ${Bv}, Guards ${C}. Smiths&Farmers ${ab}, Smiths&Guards ${ac}, Farmers&Guards ${bc}, all three ${t}. How many belong to NO guild?`,s:solveIE(A,Bv,C,ab,ac,bc,t,U),hint:'Add singles, subtract pairs, add the triple.'};}
+  const n=rnd(6,9+L),r=rnd(3,Math.min(5,n-2)),x=rnd(0,1);
+  return {tag:'Combinations',title:x?'The feuding councillors':'The war council',text:x?`Choose ${r} elders from ${n}, but two rivals refuse to sit together. How many valid councils?`:`Choose ${r} elders from ${n} (order irrelevant). How many councils?`,s:solveSel(n,r,x?'X':'C'),hint:x?'Total minus councils holding both rivals.':'Order does not matter, so C(n,r).'};}
+function nextRound(){
+  if(G.hp<=0)Object.assign(G,{lvl:1,grain:60,hp:3,streak:0,solved:0});
+  G.cur=makeRound();G.hinted=false;G.live=true;G.wager=0;
+  $('qTag').textContent=G.cur.tag;$('qTitle').textContent=`Level ${G.lvl}: ${G.cur.title}`;$('qText').textContent=G.cur.text;
+  if(G.cur.trial){trial=G.cur.trial;drawBins();}else{trial=null;$('viz').innerHTML='';}
+  $('chips').innerHTML=[0,10,25,50].filter(x=>x<=G.grain).map(x=>`<button class="chip ${x===0?'on':''}" data-w="${x}">${x} 🌾</button>`).join('');
+  document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{G.wager=+c.dataset.w;document.querySelectorAll('.chip').forEach(d=>d.classList.toggle('on',d===c));});
+  $('ctl').classList.remove('hide');$('ans').value='';$('fb').textContent='';$('btnNext').textContent='Skip (−1 wall)';
+  steps(['Work it out, then submit.'],$('log'));hud();}
+function submit(){
+  if(!G.live||$('ans').value.trim()==='')return;G.live=false;
+  const ok=B($('ans').value.trim())===G.cur.s.ans;
+  if(ok){const gain=15+5*G.lvl+G.wager*2+G.streak*2-(G.hinted?5:0);G.grain+=gain;G.streak++;G.solved++;
+    $('fb').innerHTML=`<span class="ok">Correct! +${gain} 🌾</span>`;if(G.solved%3===0){G.lvl++;$('fb').innerHTML+=' 🎉 Level up!';}}
+  else{G.grain-=G.wager;G.hp--;G.streak=0;$('fb').innerHTML=`<span class="bad">Not quite. Answer: ${G.cur.s.ans}. A wall falls.</span>`;}
+  if(G.cur.s.regions)$('viz').innerHTML=venn(G.cur.s.regions);
+  steps(G.cur.s.steps,$('log'));
+  if(G.hp<=0)$('fb').innerHTML+=`<br><span class="bad">The granary is overrun. Final grain: ${G.grain}.</span>`;
+  G.best=Math.max(G.best,G.grain);localStorage.setItem('gs2_best',G.best);
+  $('ctl').classList.add('hide');$('btnNext').textContent=G.hp<=0?'Restart':'Next round';hud();}
+$('btnGo').onclick=submit;$('ans').onkeydown=e=>{if(e.key==='Enter')submit();};
+$('btnHint').onclick=()=>{if(!G.live||G.hinted||G.grain<5)return;G.grain-=5;G.hinted=true;steps(['Hint: '+G.cur.hint],$('log'));hud();};
+$('btnNext').onclick=()=>{if(G.live){G.hp--;G.streak=0;G.live=false;hud();}nextRound();};
+
+// ===== sandbox lab =====
+const v=id=>+$(id).value;
+function out(s,extra){steps(s.steps,$('labLog'));$('labViz').innerHTML=extra||'';}
+$('bP1').onclick=()=>v('pK')>0&&v('pN')>=0?out(solvePigeonFull(v('pN'),v('pK')),v('pN')<=200?staticBins(v('pN'),v('pK')):''):0;
+$('bP2').onclick=()=>v('pK')>0&&v('pR')>0?out(solvePigeonForce(v('pK'),v('pR'))):0;
+$('bIE').onclick=()=>{const s=solveIE(v('iA'),v('iB'),v('iC'),v('iAB'),v('iAC'),v('iBC'),v('iT'),v('iU'));
+  out(s,Object.values(s.regions).some(x=>x<0)?'<p class="bad">A region is negative, so these numbers are inconsistent.</p>':venn(s.regions));};
+function sel(k){const n=v('cN'),r=v('cR');if(n<0||r<0||r>n||n>500)return steps(['Need 0 ≤ r ≤ n ≤ 500.'],$('labLog'));
+  if(k==='X'&&r<2)return steps(['Rival rule needs r ≥ 2.'],$('labLog'));out(solveSel(n,r,k));}
+$('bC1').onclick=()=>sel('C');$('bC2').onclick=()=>sel('P');$('bC3').onclick=()=>sel('X');
+
+// ===== tabs =====
+function tab(p){$('play').classList.toggle('hide',!p);$('lab').classList.toggle('hide',p);$('tabPlay').classList.toggle('on',p);$('tabLab').classList.toggle('on',!p);}
+$('tabPlay').onclick=()=>tab(true);$('tabLab').onclick=()=>tab(false);hud();
+</script>
+</body>
+</html>

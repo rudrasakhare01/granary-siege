@@ -1,0 +1,79 @@
+/* Granary Siege - styles. Warm "sticker on a notebook" look with cursor-reactive borders. */
+:root{--bg:#12141c;--paper:#1b1e2b;--ink:#f4efe3;--mut:#9ba0b5;--line:#33384d;
+--acc:#ffd166;--acc2:#06d6a0;--pink:#ef476f;--ok:#06d6a0;--bad:#ef476f;--r:16px}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.55 system-ui,"Segoe UI",Roboto,sans-serif;
+background-color:var(--bg);background-image:radial-gradient(#ffffff14 1px,transparent 1px);background-size:22px 22px}
+.wrap{max-width:1040px;margin:auto;padding:20px 18px 40px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.logo{font:700 26px "Segoe Print","Bradley Hand","Comic Sans MS",cursive;color:var(--acc);transform:rotate(-1deg)}
+.logo small{display:block;font:12px system-ui;color:var(--mut);letter-spacing:.5px}
+.tabs{display:flex;gap:6px}
+.tabs button{border:2px solid var(--line);background:none;color:var(--mut);padding:7px 16px;border-radius:10px;cursor:pointer;font:inherit;transition:.2s}
+.tabs button:hover{border-color:var(--acc);color:var(--ink)}
+.tabs button.on{border-color:var(--acc);background:var(--acc);color:#1b1e2b;font-weight:700}
+
+/* HUD */
+.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:620px){.hud{grid-template-columns:repeat(2,1fr)}}
+.stat small{color:var(--mut);display:block;font-size:11px;text-transform:uppercase;letter-spacing:.8px}
+.stat b{font-size:22px}
+.shields{letter-spacing:3px}
+.bar{height:7px;border-radius:9px;background:#ffffff1a;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .5s}
+
+/* cards and stat tiles share the interactive border */
+.card,.stat{position:relative;background:var(--paper);border:1.5px solid var(--line);border-radius:var(--r);padding:16px 18px;transition:transform .2s}
+.card:hover,.stat:hover{transform:translateY(-2px)}
+.card::before,.stat::before{content:"";position:absolute;inset:-1.5px;border-radius:inherit;padding:2px;pointer-events:none;opacity:0;transition:opacity .3s;
+background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%),var(--acc),var(--acc2) 45%,transparent 75%);
+-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.card:hover::before,.stat:hover::before{opacity:1}
+
+.grid{display:grid;grid-template-columns:3fr 2fr;gap:14px}
+@media(max-width:780px){.grid{grid-template-columns:1fr}}
+.tag{display:inline-block;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:#1b1e2b;background:var(--acc2);border-radius:6px;padding:2px 10px;margin-bottom:8px;transform:rotate(-1.5deg);font-weight:700}
+h2{margin:0 0 6px;font-size:20px}
+h3{margin:0 0 8px;font-size:15px;color:var(--acc)}
+.q{color:#e6e1d4;font-size:16px}
+.mut{color:var(--mut);font-size:13px}
+.hide{display:none}
+
+/* controls */
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{border:2px dashed var(--line);background:none;color:var(--ink);border-radius:10px;padding:5px 14px;cursor:pointer;font:inherit;transition:.2s}
+.chip:hover{border-style:solid;border-color:var(--acc)}
+.chip.on{border-style:solid;border-color:var(--acc);color:var(--acc);box-shadow:0 0 0 3px #ffd16622}
+input{background:#12141c;border:2px solid var(--line);border-radius:10px;color:var(--ink);padding:9px 12px;width:110px;font:inherit;transition:.2s}
+input:hover{border-color:var(--mut)}
+input:focus{outline:none;border-color:var(--acc2);box-shadow:0 0 0 4px #06d6a033}
+label{display:inline-flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mut);margin:0 10px 8px 0}
+
+/* sticker buttons: border + hard shadow that presses in */
+.btn{border:2px solid var(--ink);border-radius:10px;padding:9px 18px;font:inherit;font-weight:700;cursor:pointer;color:#1b1e2b;background:var(--acc);box-shadow:3px 3px 0 var(--ink);transition:transform .1s,box-shadow .1s}
+.btn:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--ink)}
+.btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.btn.ghost{background:transparent;color:var(--ink);font-weight:500;border-color:var(--line);box-shadow:3px 3px 0 var(--line)}
+.btn.ghost:hover{border-color:var(--acc2)}
+
+.fb{margin-top:10px;font-weight:600;min-height:24px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+
+/* reasoning log */
+.steps{list-style:none;margin:0;padding:0;font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.steps li{padding:7px 10px;margin-bottom:6px;border-left:3px solid var(--acc);background:#ffffff0a;border-radius:0 8px 8px 0;animation:in .4s both}
+@keyframes in{from{opacity:0;transform:translateX(-8px)}}
+
+/* storehouses */
+.bins{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.bin{width:56px;min-height:72px;border:2px dashed var(--line);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:4px;cursor:pointer;user-select:none;transition:.15s}
+.bin:hover{border-style:solid;border-color:var(--acc);transform:translateY(-3px);box-shadow:0 6px 0 #ffd16622}
+.bin:active{transform:scale(.95)}
+.bin.max{border-style:solid;border-color:var(--pink);background:#ef476f1f}
+.bin span{font-size:11px;color:var(--mut)}
+.bin div{font-size:11px;word-break:break-all;text-align:center}
+svg text{fill:#1b1e2b;font:700 13px system-ui}
+footer{text-align:center;color:var(--mut);font-size:12px;margin-top:26px}
